@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <img src="fotoğraflar/Fotoğraf.jpg"  width="320px" alt="Shareinno logo">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000000;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        input, textarea {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            margin: 5px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #000000;
+            color: white;
+            border: none;
+        }
+        .post-container {
+            margin-top: 20px;
+            text-align: left;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .comment-box {
+            margin-top: 10px;
+            padding: 5px;
+            border-top: 1px solid #ccc;
+        }
+        .comment-input {
+            width: 90%;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input style="color: #000000;"    type="text" id="username" placeholder="write your name"><br>
+        <textarea style="color: #000000;" id="postContent" placeholder="what is your think?"></textarea><br>
+        <button onclick="sharePost()">Share</button>
+        <div id="posts"></div>
+    </div>
+    
+    <script>
+        function sharePost() {
+            const username = document.getElementById("username").value;
+            const content = document.getElementById("postContent").value;
+            
+            if (!username || !content) {
+                alert("Please write your name!");
+                return;
+            }
+            
+            const postContainer = document.createElement("div");
+            postContainer.classList.add("post-container");
+            postContainer.innerHTML = `<p><strong>${username}:</strong></p><p>${content}</p><div class='comment-box'><input type='text' class='comment-input' placeholder='Reply...' onkeypress='handleComment(event, this)'></div>`;
+            
+            document.getElementById("posts").prepend(postContainer);
+            document.getElementById("postContent").value = "";
+        }
+
+        function handleComment(event, input) {
+            if (event.key === "Enter" && input.value.trim() !== "") {
+                const comment = document.createElement("p");
+                comment.innerHTML = `<strong>Reply:</strong> ${input.value}`;
+                input.parentElement.appendChild(comment);
+                input.value = "";
+            }
+        }
+        
+        
+    </script>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    
+   
+    
+    <h6 style="color: #f0f8ff;">Made by Hasan Emir Diler Ankara</h6>
+</body>
+</html>
+
+
+
