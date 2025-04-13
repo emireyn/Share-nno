@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <img src="fotoğraflar/Fotoğraf.jpg"  width="320px" alt="Shareinno logo">
+    <img src="fotoğraflar/Fotoğraf.jpg" width="320px" alt="Shareinno logo">
     
     <style>
         body {
@@ -48,60 +48,201 @@
             width: 90%;
             padding: 5px;
         }
+        #comments-section {
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .comment {
+            margin-bottom: 10px;
+            background-color: #eef;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        select {
+            margin: 20px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        .latest-posts {
+            text-align: left;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <input style="color: #000000;"    type="text" id="username" placeholder="write your name"><br>
-        <textarea style="color: #000000;" id="postContent" placeholder="what is your think?"></textarea><br>
+        <input style="color: #000000;" type="text" id="username" placeholder="Write your name"><br>
+        <textarea style="color: #000000;" id="postContent" placeholder="What is your thought?"></textarea><br>
         <button onclick="sharePost()">Share</button>
+
+        <!-- Language selection dropdown -->
+        <select id="language" onchange="changeLanguage()">
+            <option value="tr">Türkçe</option>
+            <option value="en" selected>English</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+        </select>
+        
         <div id="posts"></div>
     </div>
-    
+
+    <div class="latest-posts">
+        <h3>Latest Posts</h3>
+        <div id="latestPosts"></div>
+    </div>
+
     <script>
+        let currentLanguage = 'en'; // Default language is set to English
+        const translations = {
+            tr: {
+                shareButton: "Paylaş",
+                replyPlaceholder: "Yanıtla...",
+                commentHeading: "Yorumlar",
+                namePlaceholder: "Adınızı yazın",
+                postPlaceholder: "Ne düşünüyorsunuz?",
+                latestPosts: "En Son Paylaşımlar"
+            },
+            en: {
+                shareButton: "Share",
+                replyPlaceholder: "Reply...",
+                commentHeading: "Comments",
+                namePlaceholder: "Write your name",
+                postPlaceholder: "What is your thought?",
+                latestPosts: "Latest Posts"
+            },
+            es: {
+                shareButton: "Compartir",
+                replyPlaceholder: "Responder...",
+                commentHeading: "Comentarios",
+                namePlaceholder: "Escribe tu nombre",
+                postPlaceholder: "¿Qué piensas?",
+                latestPosts: "Últimas publicaciones"
+            },
+            de: {
+                shareButton: "Teilen",
+                replyPlaceholder: "Antworten...",
+                commentHeading: "Kommentare",
+                namePlaceholder: "Schreib deinen Namen",
+                postPlaceholder: "Was denkst du?",
+                latestPosts: "Neueste Beiträge"
+            },
+            fr: {
+                shareButton: "Partager",
+                replyPlaceholder: "Répondre...",
+                commentHeading: "Commentaires",
+                namePlaceholder: "Écris ton nom",
+                postPlaceholder: "Que penses-tu?",
+                latestPosts: "Derniers posts"
+            }
+        };
+
+        let posts = [];
+
+        function changeLanguage() {
+            const selectedLang = document.getElementById('language').value;
+            currentLanguage = selectedLang;
+            updateUI();
+            updateLatestPosts();
+        }
+
+        function updateUI() {
+            document.getElementById('postContent').placeholder = translations[currentLanguage].postPlaceholder;
+            document.getElementById('username').placeholder = translations[currentLanguage].namePlaceholder;
+            document.querySelector('button').innerText = translations[currentLanguage].shareButton;
+            document.querySelector('.latest-posts h3').innerText = translations[currentLanguage].latestPosts;
+        }
+
         function sharePost() {
             const username = document.getElementById("username").value;
             const content = document.getElementById("postContent").value;
             
             if (!username || !content) {
-                alert("Please write your name!");
+                alert("Please enter your name and thought!");
                 return;
             }
+
+            // Create a new post object
+            const post = {
+                username: username,
+                content: content,
+                language: currentLanguage,  // Add language information
+                comments: []
+            };
             
+            posts.unshift(post);  // Add the new post to the front
+            updateLatestPosts();
+            
+            // Create post container
             const postContainer = document.createElement("div");
             postContainer.classList.add("post-container");
-            postContainer.innerHTML = `<p><strong>${username}:</strong></p><p>${content}</p><div class='comment-box'><input type='text' class='comment-input' placeholder='Reply...' onkeypress='handleComment(event, this)'></div>`;
+            postContainer.innerHTML = `<p><strong>${username}:</strong></p><p>${content}</p>
+                                       <div class='comment-box'>
+                                           <input type='text' class='comment-input' placeholder='${translations[currentLanguage].replyPlaceholder}' 
+                                                  onkeypress='handleComment(event, this, "${username}")'>
+                                       </div>
+                                       <div id="comments-for-${username}" class="comments-list">
+                                           <h4>${translations[currentLanguage].commentHeading}</h4>
+                                       </div>`; 
             
             document.getElementById("posts").prepend(postContainer);
             document.getElementById("postContent").value = "";
         }
 
-        function handleComment(event, input) {
+        function handleComment(event, input, postUsername) {
             if (event.key === "Enter" && input.value.trim() !== "") {
                 const comment = document.createElement("p");
+                comment.classList.add("comment");
                 comment.innerHTML = `<strong>Reply:</strong> ${input.value}`;
-                input.parentElement.appendChild(comment);
+                
+                // Add comment to the post's comments section
+                const post = posts.find(p => p.username === postUsername);
+                post.comments.push(input.value);  // Add comment
+                document.getElementById(`comments-for-${postUsername}`).prepend(comment);
                 input.value = "";
             }
         }
-        
-        
+
+        function updateLatestPosts() {
+            const latestPostsContainer = document.getElementById("latestPosts");
+            latestPostsContainer.innerHTML = ""; // Clear previous posts
+            posts.filter(post => post.language === currentLanguage)  // Only show posts in selected language
+                .forEach(post => {
+                    const postElement = document.createElement("div");
+                    postElement.classList.add("post-container");
+                    postElement.innerHTML = `<p><strong>${post.username}:</strong></p><p>${post.content}</p>
+                                             <div class='comment-box'>
+                                                 <input type='text' class='comment-input' placeholder='${translations[currentLanguage].replyPlaceholder}' 
+                                                        onkeypress='handleComment(event, this, "${post.username}")'>
+                                             </div>
+                                             <div id="comments-for-${post.username}" class="comments-list">
+                                                 <h4>${translations[currentLanguage].commentHeading}</h4>
+                                             </div>`;
+                    latestPostsContainer.appendChild(postElement);
+                });
+        }
+
+        // Initialize UI with the default language
+        updateUI();
     </script>
-    <br><br>
-    <br><br>
-    <br><br>
-    <br><br>
-    <br><br>
-    <br><br>
-    <br><br>
-    <br><br>
-    <br><br>
     
-   
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
+    <br><br>
     
     <h6 style="color: #f0f8ff;">Made by Hasan Emir Diler Ankara</h6>
 </body>
 </html>
-
-
-
